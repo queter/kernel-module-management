@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 echo "Expose the registry outside the cluster"
-kubectl apply -f ../registry-nodeport.yaml
+kubectl apply -f ci/registry-nodeport.yaml
 
 echo "Deploy KMMO..."
 make deploy
@@ -23,14 +23,14 @@ kubectl create secret generic build-secret --from-literal=ci-build-secret=super-
       # Wait up to 6 minutes, which corresponds to our job's maximum lifetime including backoffs.
 echo "Wait for the internal registry to be available in CoreDNS"
 echo "and if fails check the status of components in the kube-system namespace..."
-kubectl apply -f ../job-wait-minikube-registry-alias.yaml
+kubectl apply -f ci/job-wait-minikube-registry-alias.yaml
 timeout 6m kubectl wait --for=condition=Complete --timeout -1s job/wait-minikube-registry-alias || kubectl get all -n kube-system
 
 echo "Add a configmap that contain the kernel module build dockerfile..."
-kubectl apply -f ../kmm-kmod-dockerfile.yaml
+kubectl apply -f ci/kmm-kmod-dockerfile.yaml
 
 echo "Add an kmm-ci Module that contains a valid mapping..."
-sed -e "s/KVER_CHANGEME/$(uname -r)/g" ../module-kmm-ci-build.template.yaml | tee module-kmm-ci.yaml
+sed -e "s/KVER_CHANGEME/$(uname -r)/g" ci/module-kmm-ci-build.template.yaml | tee module-kmm-ci.yaml
 kubectl apply -f module-kmm-ci.yaml
 
 echo "Wait for the job to be created..."

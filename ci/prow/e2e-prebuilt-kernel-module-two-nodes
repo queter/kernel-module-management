@@ -22,19 +22,19 @@ echo "Check that the kmm_ci_a module is not loaded on the node..."
             exit 1
           fi
 echo "Create one module for each node..."
-          # Node minikube gets module a
-          sed -e s/NAME_CHANGEME/kmm-ci-a/g \
-            -e s/KMOD_CHANGEME/kmm_ci_a/g \
-            -e "s/KVER_CHANGEME/$(uname -r)/g" \
-            ../module-kmm-ci.template.yaml | tee module-kmm-ci-a.yaml
+# Node minikube gets module a
+sed -e s/NAME_CHANGEME/kmm-ci-a/g \
+    -e s/KMOD_CHANGEME/kmm_ci_a/g \
+    -e "s/KVER_CHANGEME/$(uname -r)/g" \
+    ci/module-kmm-ci.template.yaml | tee module-kmm-ci-a.yaml
 
-          # Node minikube-m02 gets module b
-          sed -e s/NAME_CHANGEME/kmm-ci-b/g \
-            -e s/KMOD_CHANGEME/kmm_ci_b/g \
-            -e "s/KVER_CHANGEME/$(uname -r)/g" \
-            ../module-kmm-ci.template.yaml | tee module-kmm-ci-b.yaml
+# Node minikube-m02 gets module b
+sed -e s/NAME_CHANGEME/kmm-ci-b/g \
+    -e s/KMOD_CHANGEME/kmm_ci_b/g \
+    -e "s/KVER_CHANGEME/$(uname -r)/g" \
+    ci/module-kmm-ci.template.yaml | tee module-kmm-ci-b.yaml
 
-          kubectl apply -f module-kmm-ci-a.yaml -f module-kmm-ci-b.yaml
+kubectl apply -f module-kmm-ci-a.yaml -f module-kmm-ci-b.yaml
 
 
 echo "Label the first node to have it receive module a..."
