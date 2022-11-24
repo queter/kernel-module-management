@@ -20,7 +20,7 @@ build_driver_container () {
 }
 
 build_internal_registry_driver_container () {
-      apt-get -y update && apt-get -y install skopeo
+      sudo apt-get -y update && apt-get -y install skopeo
       build_driver_container && minikube image save kmm-kmod_local.tar
       MINIKUBE_REGISTRY_EXT="$(minikube service registry-nodeport -n kube-system --format '{{.IP}}:{{.Port}}' --url)"
       skopeo copy --dest-tls-verify=false docker-archive:kmm-kmod_local.tar docker://${MINIKUBE_REGISTRY_EXT}/kmm-base:local

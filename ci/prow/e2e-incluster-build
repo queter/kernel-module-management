@@ -30,7 +30,7 @@ echo "Add a configmap that contain the kernel module build dockerfile..."
 kubectl apply -f ../kmm-kmod-dockerfile.yaml
 
 echo "Add an kmm-ci Module that contains a valid mapping..."
-sed -e "s/KVER_CHANGEME/$(uname -r)/g" ci/module-kmm-ci-build.template.yaml | tee module-kmm-ci.yaml
+sed -e "s/KVER_CHANGEME/$(uname -r)/g" ../module-kmm-ci-build.template.yaml | tee module-kmm-ci.yaml
 kubectl apply -f module-kmm-ci.yaml
 
 echo "Wait for the job to be created..."
@@ -68,7 +68,7 @@ echo "::group::Looking for the build secret"
           echo "::endgroup::"
 
 echo "Remove the Module..."
-kubectl delete -f ../module-kmm-ci.yaml
+kubectl delete -f module-kmm-ci.yaml
 
 echo "Check that the module gets unloaded from the node..."
           until timeout 1m ! minikube ssh -- lsmod | grep kmm_ci_a; do
