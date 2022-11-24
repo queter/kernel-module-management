@@ -26,13 +26,13 @@ echo "Create one module for each node..."
           sed -e s/NAME_CHANGEME/kmm-ci-a/g \
             -e s/KMOD_CHANGEME/kmm_ci_a/g \
             -e "s/KVER_CHANGEME/$(uname -r)/g" \
-            ci/module-kmm-ci.template.yaml | tee module-kmm-ci-a.yaml
+            ../module-kmm-ci.template.yaml | tee module-kmm-ci-a.yaml
 
           # Node minikube-m02 gets module b
           sed -e s/NAME_CHANGEME/kmm-ci-b/g \
             -e s/KMOD_CHANGEME/kmm_ci_b/g \
             -e "s/KVER_CHANGEME/$(uname -r)/g" \
-            ci/module-kmm-ci.template.yaml | tee module-kmm-ci-b.yaml
+            ../module-kmm-ci.template.yaml | tee module-kmm-ci-b.yaml
 
           kubectl apply -f module-kmm-ci-a.yaml -f module-kmm-ci-b.yaml
 
@@ -51,7 +51,7 @@ kubectl label node minikube-m02 wants-module=kmm_ci_b
 echo "Check that module b gets loaded on the second node..."
           sleep 3
           echo "DEBUG:"
-          k describe po
+          kubectl describe po
           until timeout 1m minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
             sleep 3
           done
