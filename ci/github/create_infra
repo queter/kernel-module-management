@@ -11,7 +11,7 @@ build_cluster () {
 }
 
 build_controller () {
-      make docker-build  
+      make docker-build && make deploy 
 }
 
 build_driver_container () {

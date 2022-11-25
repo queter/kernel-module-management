@@ -6,7 +6,7 @@ echo "Label the node so that it gets the module..."
 kubectl label node minikube wants-module=kmm_ci_a
 
 echo "Deploy KMMO..."
-make deploy
+#make deploy
 
 echo "Wait until the KMMO Deployment is Available..."
 kubectl wait --for condition=Available deployments.apps -n kmm-operator-system kmm-operator-controller-manager --request-timeout=1m
