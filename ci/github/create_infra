@@ -15,9 +15,11 @@ build_controller () {
 }
 
 build_driver_container () {
-      cd ci/kmm-kmod && make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" && \ 
-      docker build -t kmm-kmod:local build-arg=KERNEL_VERSION=$(uname -r) . && \ 
-      docker save kmm-kmod:local -o kmm-kmod_local.tar 
+
+      cd ci/kmm-kmod && make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" && \
+      minikube image build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) . 
+
+
 }
 
 build_internal_registry_driver_container () {
