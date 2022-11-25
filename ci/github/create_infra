@@ -17,8 +17,8 @@ build_controller () {
 build_driver_container () {
       cd ci/kmm-kmod && make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" && \
 #      minikube image build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) . 
-      eval $(minikube docker-env) && \
-      docker build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) .
+      docker build -t kmm-kmod:local --build-arg=KERNEL_VERSION=$(uname -r) . &&\
+      docker save -o kmm-kmod_local.tar kmm-kmod:local
 
 }
 
@@ -26,6 +26,7 @@ build_internal_registry_driver_container () {
       sudo apt-get -y update && sudo apt-get -y install skopeo
       build_cluster
       build_driver_container && minikube image save kmm-kmod_local.tar
+      kubectl apply -f ci/registry-nodeport.yaml
       MINIKUBE_REGISTRY_EXT="$(minikube service registry-nodeport -n kube-system --format '{{.IP}}:{{.Port}}' --url)"
       skopeo copy --dest-tls-verify=false docker-archive:kmm-kmod_local.tar docker://${MINIKUBE_REGISTRY_EXT}/kmm-base:local
       build_controller
