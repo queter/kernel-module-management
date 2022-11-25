@@ -11,12 +11,15 @@ build_cluster () {
 }
 
 build_controller () {
-      make docker-build && make deploy 
+      make docker-build 
 }
 
 build_driver_container () {
       cd ci/kmm-kmod && make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" && \
-      minikube image build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) . 
+#      minikube image build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) . 
+      eval $(minikube docker-env) && \
+      docker build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) .
+
 }
 
 build_internal_registry_driver_container () {
