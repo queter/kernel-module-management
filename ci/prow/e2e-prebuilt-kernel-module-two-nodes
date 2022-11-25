@@ -5,19 +5,10 @@ set -euxo pipefail
 echo "Deploy KMMO..."
 make deploy
 
-echo "Wait until the KMMO Deployment is Available..."
-kubectl wait --for condition=Available deployments.apps -n kmm-operator-system kmm-operator-controller-manager --request-timeout=1m
+echo "Wait until the KMMO Deployment is Available and "
+echo "describe the Deployment and get it YAML if that failed..."
+kubectl wait --for condition=Available deployments.apps -n kmm-operator-system kmm-operator-controller-manager --request-timeout=1m || kubectl describe deployments.apps -n kmm-operator-system kmm-operator-controller-manager && kubectl get -o yaml deployments.apps -n kmm-operator-system kmm-operator-controller-manager
 
-
-echo "Describe the Deployment and get its YAML if that failed..."
-kubectl describe deployments.apps -n kmm-operator-system kmm-operator-controller-manager
-kubectl get -o yaml deployments.apps -n kmm-operator-system kmm-operator-controller-manager
-
-echo "Check that the kmm_ci_a module is not loaded on the node..."
-          if minikube ssh -- lsmod | grep kmm_ci_a; then
-            echo "Unexpected lsmod output - the module should not be loaded"
-            exit 1
-          fi
 echo "Create one module for each node..."
 # Node minikube gets module a
 sed -e s/NAME_CHANGEME/kmm-ci-a/g \

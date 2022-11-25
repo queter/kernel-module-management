@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Create the test's infra
-        run: source ./ci/github/create_infra --nodes 2 && build_cluster --nodes 2 && build_controller && build_driver_container
+        run: source ./ci/github/create_infra --nodes 2 && build_cluster && build_controller && build_driver_container
 
       - name: Run e2e-prebuilt-kernel-module-two-nodes
         run: ./ci/prow/e2e-prebuilt-kernel-module-two-nodes
