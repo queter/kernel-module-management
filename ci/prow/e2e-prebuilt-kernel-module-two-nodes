@@ -29,30 +29,32 @@ echo "Label the first node to have it receive module a..."
 kubectl label node minikube wants-module=kmm_ci_a
 
 echo "Check that module a gets loaded on the first node..."
-          until timeout 1m minikube ssh -- lsmod | grep kmm_ci_a; do
-            sleep 3
-          done
+until timeout 1m minikube ssh -- lsmod | grep kmm_ci_a; do
+      sleep 3
+done
 
 echo "Label the second node to have it receive module b..."
 kubectl label node minikube-m02 wants-module=kmm_ci_b
 
 echo "Check that module b gets loaded on the second node..."
-          until timeout 1m minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
-            sleep 3
-          done
+until timeout 1m minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
+      sleep 3
+done
 
 echo "Remove the wants-module label on the second node..."
 kubectl label node minikube-m02 wants-module-
 
+echo "Test:"
+kubectl describe po 
 echo "Check that module b gets unloaded from the second node..."
-          until ! minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
-            sleep 3
-          done 
+until ! minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
+      sleep 3
+done 
 
 echo "Verify that the DaemonSet gets garbage collected..."
           # Cannot use kubectl wait because it will fail if there is no initial match
-          until [ $(kubectl get daemonsets.apps -l 'kmm.node.kubernetes.io/module.name=kmm-ci-b, kmm.node.kubernetes.io/role!=device-plugin' -o go-template='{{ len .items }}') -eq 0 ]; do
-            sleep 3
-          done
+until [ $(kubectl get daemonsets.apps -l 'kmm.node.kubernetes.io/module.name=kmm-ci-b, kmm.node.kubernetes.io/role!=device-plugin' -o go-template='{{ len .items }}') -eq 0 ]; do
+      sleep 3
+done
 
 

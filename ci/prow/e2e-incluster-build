@@ -34,46 +34,49 @@ sed -e "s/KVER_CHANGEME/$(uname -r)/g" ci/module-kmm-ci-build.template.yaml | te
 kubectl apply -f module-kmm-ci.yaml
 
 echo "Wait for the job to be created..."
-          until timeout 1m kubectl get job -l kmm.node.kubernetes.io/module.name | grep kmm; do
-            sleep 1
-          done
+until timeout 1m kubectl get job -l kmm.node.kubernetes.io/module.name | grep kmm; do
+      sleep 1
+done
 
 echo "Check that the module gets loaded on the node..."
-          until timeout 1m minikube ssh -- lsmod | grep kmm_ci_a; do
-            sleep 3
-          done
+until timeout 1m minikube ssh -- lsmod | grep kmm_ci_a; do
+      sleep 3
+done
 
 echo "Check that the DriverContainer prints the secret's value to the standard output..."
 POD_NAME=$(kubectl get pod -l kmm.node.kubernetes.io/module.name --template='{{ (index .items 0).metadata.name }}')
 KERNEL_VERSION=$(uname -r)
 echo "::group::Looking for the build secret"
-          until timeout 1m kubectl exec $POD_NAME -- grep super-secret-value /ci-build-secret; do
-            sleep 3
-          done
-          echo "::endgroup::"
-          echo "::group::Looking for the build argument"
-          until timeout 1m kubectl exec $POD_NAME -- grep some-build-arg /build-arg; do
-            sleep 3
-          done
-          echo "::endgroup::"
-          echo "::group::Looking for the kernel version"
-          until timeout 1m kubectl exec $POD_NAME -- grep $KERNEL_VERSION /kernel-version; do
-            sleep 3
-          done
-          echo "::endgroup::"
-          echo "::group::Looking for the build argument with a default value"
-          until timeout 1m kubectl exec $POD_NAME -- grep default-value /default-value; do
-            sleep 3
-          done
-          echo "::endgroup::"
+until timeout 1m kubectl exec $POD_NAME -- grep super-secret-value /ci-build-secret; do
+      sleep 3
+done
+echo "::endgroup::"
+
+echo "::group::Looking for the build argument"
+until timeout 1m kubectl exec $POD_NAME -- grep some-build-arg /build-arg; do
+      sleep 3
+done
+echo "::endgroup::"
+
+echo "::group::Looking for the kernel version"
+until timeout 1m kubectl exec $POD_NAME -- grep $KERNEL_VERSION /kernel-version; do
+      sleep 3
+done
+echo "::endgroup::"
+
+echo "::group::Looking for the build argument with a default value"
+until timeout 1m kubectl exec $POD_NAME -- grep default-value /default-value; do
+      sleep 3
+done
+echo "::endgroup::"
 
 echo "Remove the Module..."
 kubectl delete -f module-kmm-ci.yaml
 
 echo "Check that the module gets unloaded from the node..."
-          until timeout 1m ! minikube ssh -- lsmod | grep kmm_ci_a; do
-            sleep 3
-          done
+until timeout 1m ! minikube ssh -- lsmod | grep kmm_ci_a; do
+      sleep 3
+done
 
 echo "Collect troubleshooting data ..."
 ../github/collect-troubleshooting

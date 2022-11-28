@@ -15,7 +15,8 @@ build_controller () {
 }
 
 build_driver_container () {
-      cd ci/kmm-kmod && make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" && \
+      cd ci/kmm-kmod 
+      make KERNEL_SRC_DIR="/usr/src/linux-headers-$(uname -r)" 
       minikube image build -t kmm-kmod:local --build-opt build-arg=KERNEL_VERSION=$(uname -r) . 
 }
 
@@ -25,7 +26,7 @@ build_internal_registry_driver_container () {
       build_driver_container && minikube image save kmm-kmod_local.tar
       kubectl apply -f ../registry-nodeport.yaml
       MINIKUBE_REGISTRY_EXT="$(minikube service registry-nodeport -n kube-system --format '{{.IP}}:{{.Port}}' --url)"
-      skopeo copy --dest-tls-verify=false docker-archive:kmm-kmod_local.tar docker://${MINIKUBE_REGISTRY_EXT}/kmm-base:local
+      skopeo copy --dest-tls-verify=false kmm-kmod_local.tar docker://${MINIKUBE_REGISTRY_EXT}/kmm-base:local
       build_controller
       # name: Import the KMMO image into minikube
       # run: minikube image load kmm_local.tar
@@ -39,8 +40,6 @@ collect_troubleshooting () {
       kubectl describe pod -l kmm.node.kubernetes.io/module.name
       sudo dmesg
       kubectl logs deployment.apps/kmm-operator-controller-manager -n kmm-operator-system
-      # If fails
-      echo "Describe the Deployment and get its YAML if that failed..."
       kubectl describe deployments.apps -n kmm-operator-system kmm-operator-controller-manager
       kubectl get -o yaml deployments.apps -n kmm-operator-system kmm-operator-controller-manager
 }
