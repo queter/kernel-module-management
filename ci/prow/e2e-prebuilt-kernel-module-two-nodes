@@ -38,7 +38,9 @@ kubectl label node minikube-m02 wants-module=kmm_ci_b
 
 echo "Debug:"
 kubectl describe po
-kubectl logs -l wants-module=kmm_ci_b
+kubectl get po -o yaml
+kubectl logs -l kmm.node.kubernetes.io/module.name=kmm-ci-b
+
 
 echo "Check that module b gets loaded on the second node..."
 until timeout 1m minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
