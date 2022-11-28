@@ -36,6 +36,10 @@ done
 echo "Label the second node to have it receive module b..."
 kubectl label node minikube-m02 wants-module=kmm_ci_b
 
+echo "Debug:"
+kubectl describe po
+kubectl logs -l wants-module=kmm_ci_b
+
 echo "Check that module b gets loaded on the second node..."
 until timeout 1m minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
       sleep 3
@@ -44,8 +48,6 @@ done
 echo "Remove the wants-module label on the second node..."
 kubectl label node minikube-m02 wants-module-
 
-echo "Test:"
-kubectl describe po 
 echo "Check that module b gets unloaded from the second node..."
 until ! minikube ssh -n minikube-m02 -- lsmod | grep kmm_ci_b; do
       sleep 3
